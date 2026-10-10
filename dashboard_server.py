@@ -862,7 +862,7 @@ async def handle_cleanup_stale(request: web.Request) -> web.Response:
         return web.json_response({"status": "error", "error": str(e)}, status=500)
 
 
-async def start_web_dashboard(host: str = "0.0.0.0", port: int = 30058):
+async def start_web_dashboard(host: str = "0.0.0.0", port: int = 20333):
     app = web.Application()
     app.router.add_get("/", handle_index)
     app.router.add_get("/api/stats", handle_get_stats)
