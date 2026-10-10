@@ -39,7 +39,7 @@ from dashboard_server import bot_state, start_web_dashboard
 
 # ==================== CONFIGURATION ====================
 WEB_HOST = "0.0.0.0"
-WEB_PORT = 20333
+WEB_PORT = int(os.environ.get("SERVER_PORT", "20333"))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ACCOUNTS_FILE = os.path.join(BASE_DIR, "accounts.json")
 TOKEN_CACHE_FILE = os.path.join(BASE_DIR, "token_cache.json")
