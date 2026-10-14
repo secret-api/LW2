@@ -553,7 +553,7 @@ async def handle_cleanup_stale(request: web.Request) -> web.Response:
     await write_json(ACCOUNTS_FILE, kept)
     return web.json_response({"status": "ok", "removed": len(persisted) - len(kept)})
 
-async def start_web_dashboard(host: str = "0.0.0.0", port: int = 20333):
+async def start_web_dashboard(host: str = "0.0.0.0", port: int = 30058):
     app = web.Application()
     app.router.add_get("/", handle_index)
     app.router.add_get("/api/stats", handle_get_stats)
