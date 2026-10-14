@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Level Up System | Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<style>
+:root{
+  --bg:#061014;--card:rgba(10,31,35,.68);--card-h:rgba(14,48,53,.84);
+  --line:rgba(45,212,191,.16);--line-h:rgba(45,212,191,.42);
+  --violet:#14b8a6;--indigo:#0d9488;--blue:#06b6d4;--cyan:#67e8f9;
+  --grad:linear-gradient(135deg,#14b8a6,#06b6d4);
+  --grad-soft:linear-gradient(135deg,rgba(20,184,166,.22),rgba(6,182,212,.20));
+  --ok:#34d399;--warn:#fbbf24;--err:#fb7185;
+  --text:#ecfeff;--dim:#86a9ad;
+  --ease:.3s cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;display:flex;flex-direction:column}
+button,input,select,textarea{font-family:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse at 18% 0%,#063f3d 0%,transparent 55%),radial-gradient(ellipse at 90% 100%,#06344a 0%,transparent 55%),var(--bg)}
+.bg::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(45,212,191,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(45,212,191,.05) 1px,transparent 1px);background-size:44px 44px;-webkit-mask-image:radial-gradient(ellipse at 50% 30%,#000 0%,transparent 72%);mask-image:radial-gradient(ellipse at 50% 30%,#000 0%,transparent 72%)}
+
+.topbar{display:flex;align-items:center;gap:14px;padding:12px 20px;padding-top:max(12px,env(safe-area-inset-top));border-bottom:1px solid var(--line);background:rgba(6,16,20,.7);backdrop-filter:blur(16px);flex-shrink:0;z-index:20}
+.menu-btn{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:16px;cursor:pointer;transition:var(--ease);display:grid;place-items:center;flex-shrink:0}
+.menu-btn:hover{border-color:var(--violet);background:var(--card-h)}
+.top-title{font-weight:800;font-size:17px;letter-spacing:.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-title small{display:block;font-size:11px;font-weight:500;color:var(--dim);letter-spacing:0;margin-top:1px}
+.pill{margin-inline-start:auto;display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:12px;font-weight:700;flex-shrink:0}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.pill.off .dot{background:var(--err);box-shadow:0 0 10px var(--err)}
+
+.overlay{position:fixed;inset:0;z-index:40;background:rgba(3,10,16,.6);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity var(--ease)}
+body.menu-open .overlay{opacity:1;pointer-events:all}
+.sidebar{position:fixed;top:0;bottom:0;left:0;width:min(290px,84vw);z-index:50;display:flex;flex-direction:column;padding:26px 18px;padding-top:max(26px,env(safe-area-inset-top));background:rgba(8,26,32,.97);backdrop-filter:blur(20px);border-right:1px solid var(--line);transform:translateX(-102%);transition:transform var(--ease);box-shadow:20px 0 60px rgba(0,0,0,.5)}
+body.menu-open .sidebar{transform:none}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:34px;padding:0 6px}
+.brand-icon{width:44px;height:44px;border-radius:13px;background:var(--grad);display:grid;place-items:center;font-size:19px;box-shadow:0 8px 24px rgba(20,184,166,.45);color:#fff}
+.brand-name{font-size:20px;font-weight:800;letter-spacing:1px;background:linear-gradient(90deg,#fff,#67e8f9);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.brand-sub{font-size:11px;color:var(--dim);margin-top:2px}
+.nav{display:flex;flex-direction:column;gap:6px;flex:1}
+.nav-item{display:flex;align-items:center;gap:14px;padding:13px 16px;border-radius:12px;color:var(--dim);font-weight:600;font-size:14.5px;cursor:pointer;border:1px solid transparent;transition:var(--ease);background:none;text-align:left;width:100%}
+.nav-item i{width:22px;text-align:center;font-size:16px}
+.nav-item:hover{color:#fff;background:rgba(20,184,166,.1)}
+.nav-item.active{color:#fff;background:var(--grad-soft);border-color:var(--line-h)}
+.nav-item.active i{color:var(--cyan)}
+.side-foot{padding:16px 8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.5}
+.side-foot b{display:block;color:var(--ok);font-size:13px}
+
+.main{flex:1;position:relative;min-height:0}
+.page{position:absolute;inset:0;padding:24px clamp(16px,4vw,40px) 40px;overflow-y:auto;display:none;flex-direction:column}
+.page.active{display:flex;animation:fade .35s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+.page-title{font-size:clamp(22px,3.5vw,28px);font-weight:800}
+.page-sub{color:var(--dim);font-size:13.5px;margin-top:4px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+
+.btn{padding:10px 16px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:var(--ease);display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{border-color:var(--violet);background:var(--card-h);transform:translateY(-2px)}
+.btn.primary{background:var(--grad);border:0;color:#fff;box-shadow:0 8px 24px rgba(20,184,166,.4)}
+.btn.primary:hover{box-shadow:0 10px 32px rgba(20,184,166,.6)}
+.btn.warn{border-color:rgba(251,191,36,.45);color:var(--warn)}
+.btn.warn:hover{background:rgba(251,191,36,.1);border-color:var(--warn)}
+.btn.danger{border-color:rgba(251,113,133,.45);color:var(--err)}
+.btn.danger:hover{background:rgba(251,113,133,.1);border-color:var(--err)}
+
+/* ----- DISCORD-STYLE REFRESH SPIN ----- */
+@keyframes discordSpin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.btn.refreshing i.fa-rotate,
+.btn.refreshing i.fa-arrows-rotate {
+  animation: discordSpin 0.8s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+  display: inline-block;
+}
+.btn:active {
+  transform: translateY(1px) scale(0.97) !important;
+  transition: transform 0.08s ease !important;
+}
+/* ------------------------------------ */
+
+.top-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.top-actions .btn{padding:14px 8px;font-size:13px;flex-direction:column;gap:6px;text-align:center;line-height:1.2}
+.top-actions .btn i{font-size:16px}
+.add-new-btn{width:100%;justify-content:center;padding:15px;margin-bottom:18px;font-size:14px;font-weight:800}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;backdrop-filter:blur(14px);transition:var(--ease)}
+.stat:hover{transform:translateY(-3px);border-color:var(--line-h);background:var(--card-h)}
+.stat-icon{width:42px;height:42px;border-radius:12px;background:var(--grad-soft);color:var(--cyan);display:grid;place-items:center;font-size:17px;margin-bottom:14px}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:clamp(24px,3vw,30px);font-weight:700;word-break:break-all}
+.stat-label{color:var(--dim);font-size:12.5px;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.stat-foot{color:var(--cyan);font-size:12px;font-weight:600;margin-top:10px}
+
+.chart-wrap{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;backdrop-filter:blur(14px);margin-top:6px}
+.chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.chart-head h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:9px}
+.chart-head h3 i{color:var(--cyan);filter:drop-shadow(0 0 8px rgba(103,232,249,.6))}
+.chart-head h3::after{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 10px #34d399,0 0 20px rgba(52,211,153,.5);margin-left:8px;animation:livePulse 1.8s ease-in-out infinite;vertical-align:middle;}
+@keyframes livePulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+.chart-head small{color:var(--cyan);font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.chart-svg{width:100%;height:180px;display:block}
+.chart-svg path.line{fill:none;stroke:url(#lg);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.chart-svg path.fill{fill:url(#fg);opacity:.35}
+.chart-svg circle{fill:#67e8f9;stroke:#061014;stroke-width:2}
+
+.controls{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.search{flex:1;min-width:220px;position:relative}
+.search i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--dim)}
+.search input{width:100%;padding:12px 14px 12px 40px;border-radius:11px;border:1px solid var(--line);background:rgba(5,16,20,.5);color:#fff;font-size:13px;outline:none;transition:var(--ease)}
+.search input:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(20,184,166,.18)}
+.seg{display:flex;gap:4px;padding:4px;border-radius:11px;background:rgba(5,16,20,.5);border:1px solid var(--line);overflow-x:auto;max-width:100%}
+.seg button{border:0;background:none;color:var(--dim);padding:8px 13px;border-radius:8px;cursor:pointer;font-size:12.5px;font-weight:700;white-space:nowrap;transition:var(--ease)}
+.seg button:hover{color:#fff}
+.seg button.active{color:#fff;background:var(--grad)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));
+  gap:12px;
+}
+.node{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 16px;
+  backdrop-filter:blur(14px);
+  transition:var(--ease);
+  position:relative;
+  overflow:hidden;
+}
+.node::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--grad)}
+.node:hover{border-color:var(--line-h);transform:translateY(-2px);background:var(--card-h)}
+
+.node-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:10px;
+}
+.who{display:flex;align-items:center;gap:10px;min-width:0}
+.avatar{
+  position:relative;
+  width:36px;height:36px;
+  flex-shrink:0;
+  border-radius:10px;
+  background:var(--grad-soft);
+  border:1px solid var(--line-h);
+  display:grid;place-items:center;
+  color:var(--cyan);
+  font-size:15px;
+}
+.lvl{
+  position:absolute;
+  right:-5px;bottom:-5px;
+  padding:1px 5px;
+  border-radius:6px;
+  font-size:8.5px;
+  font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+  background:var(--grad);
+  border:2px solid var(--bg);
+  color:#fff;
+}
+.name{
+  font-size:13px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  min-width:0;
+  flex-wrap:wrap;
+  line-height:1.2;
+}
+.name span:first-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  max-width:110px;
+}
+.region{
+  padding:1px 5px;
+  border-radius:4px;
+  font-size:8.5px;
+  font-weight:800;
+  color:var(--violet);
+  background:rgba(20,184,166,.15);
+  border:1px solid rgba(20,184,166,.3);
+}
+.match-count{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  padding:1px 5px;
+  border-radius:4px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  font-weight:800;
+  background:rgba(6,182,212,.15);
+  border:1px solid rgba(6,182,212,.35);
+  color:var(--cyan);
+}
+.uid{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  margin-top:2px;
+  color:var(--dim);
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;
+}
+.uid i{cursor:pointer;font-size:9px}
+.uid i:hover{color:#fff}
+
+.badge{
+  padding:4px 8px;
+  border-radius:7px;
+  font-size:9px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:4px;
+  border:1px solid;
+  flex-shrink:0;
+  white-space:nowrap;
+}
+.s-online{color:var(--ok);background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.3)}
+.s-match{color:var(--cyan);background:rgba(56,189,248,.12);border-color:rgba(56,189,248,.4);box-shadow:0 0 10px rgba(56,189,248,.2)}
+.s-match.br{color:#fb923c;background:rgba(251,146,60,.14);border-color:rgba(251,146,60,.45);box-shadow:0 0 12px rgba(251,146,60,.25)}
+.s-match.lonewolf{color:#a78bfa;background:rgba(167,139,250,.14);border-color:rgba(167,139,250,.45);box-shadow:0 0 12px rgba(167,139,250,.25)}
+.s-paused{color:var(--dim);background:rgba(134,169,173,.1);border-color:rgba(134,169,173,.3)}
+.s-error{color:var(--warn);background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.3)}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  margin-bottom:10px;
+}
+.metric{
+  padding:6px 4px;
+  border-radius:8px;
+  background:rgba(5,16,20,.5);
+  border:1px solid rgba(255,255,255,.05);
+  min-width:0;
+  text-align:center;
+}
+.metric span{
+  display:block;
+  color:var(--dim);
+  font-size:7.5px;
+  font-weight:600;
+  margin-bottom:2px;
+  text-transform:uppercase;
+  letter-spacing:.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.metric strong{
+  display:block;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:var(--text);
+}
+.metric.start strong{color:#67e8f9}
+.metric.live strong{color:#34d399}
+.metric.match strong{color:#fbbf24}
+.metric.gain strong{color:#fb7185}
+
+.prog-top,.prog-bot{
+  display:flex;
+  justify-content:space-between;
+  font-size:9px;
+  color:var(--dim);
+  font-weight:600;
+}
+.prog-bot{font-family:'JetBrains Mono',monospace;margin-top:3px}
+.prog-bot .pct{color:var(--cyan);font-weight:700}
+.track{height:5px;margin-top:4px;background:rgba(5,16,20,.7);border-radius:9px;overflow:hidden}
+.fill{height:100%;background:linear-gradient(90deg,#14b8a6,#06b6d4,#67e8f9);transition:width .6s ease;border-radius:9px}
+
+.node-foot{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.time{
+  color:var(--dim);
+  font-size:9.5px;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-family:'JetBrains Mono',monospace;
+}
+.acts{display:flex;gap:5px}
+.act{
+  width:28px;height:28px;
+  border-radius:8px;
+  border:1px solid var(--line);
+  background:rgba(5,16,20,.4);
+  color:var(--dim);
+  cursor:pointer;
+  font-size:10px;
+  transition:var(--ease);
+  display:grid;
+  place-items:center;
+}
+.act:hover{color:#fff;border-color:var(--violet);background:rgba(20,184,166,.15);transform:translateY(-1px)}
+.act.danger:hover{color:var(--err);border-color:var(--err);background:rgba(251,113,133,.1)}
+
+.empty{grid-column:1/-1;text-align:center;padding:56px 16px;color:var(--dim)}
+.empty i{font-size:30px;margin-bottom:14px;color:var(--violet);display:block}
+.empty .btn{margin-top:18px}
+
+/* ==================== LIVE LOGS ==================== */
+.logs-top-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+.logs-top-actions .btn{
+  padding:14px 8px;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.6px;
+  text-transform:uppercase;
+  flex-direction:row;
+  gap:8px;
+  text-align:left;
+  line-height:1.15;
+  border-radius:12px;
+  background:rgba(6,182,212,.06);
+  border:1.5px solid rgba(103,232,249,.4);
+  color:#67e8f9;
+  justify-content:flex-start;
+  box-shadow:0 0 0 rgba(103,232,249,0);
+  transition:var(--ease);
+}
+.logs-top-actions .btn i{
+  font-size:16px;
+  color:#67e8f9;
+  flex-shrink:0;
+}
+.logs-top-actions .btn span{
+  display:block;
+  white-space:pre-line;
+  line-height:1.15;
+}
+.logs-top-actions .btn:hover{
+  background:rgba(6,182,212,.14);
+  border-color:#67e8f9;
+  color:#a5f3fc;
+  box-shadow:0 0 20px rgba(103,232,249,.25);
+  transform:translateY(-1px);
+}
+.logs-top-actions .btn:hover i{color:#a5f3fc}
+.logs-top-actions .btn.primary,
+.logs-top-actions .btn.warn,
+.logs-top-actions .btn.danger{
+  background:rgba(6,182,212,.06);
+  border-color:rgba(103,232,249,.4);
+  color:#67e8f9;
+  box-shadow:none;
+}
+.logs-top-actions .btn.primary:hover,
+.logs-top-actions .btn.warn:hover,
+.logs-top-actions .btn.danger:hover{
+  background:rgba(6,182,212,.14);
+  border-color:#67e8f9;
+  color:#a5f3fc;
+}
+
+.logs-tag-row {
+  display: flex;
+  margin-bottom: 16px;
+  overflow-x: auto;
+}
+.logs-tag-row::-webkit-scrollbar {
+  display: none;
+}
+.logs-tag-row .seg {
+  flex: 0 1 auto;
+  display: inline-flex;
+  justify-content: flex-start;
+  gap: 2px;
+  padding: 5px;
+  background: rgba(10, 31, 35, 0.4);
+  border: 1px solid rgba(45, 212, 191, 0.2);
+  border-radius: 14px;
+}
+.logs-tag-row .seg button {
+  flex: none;
+  text-align: center;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
+  color: #86a9ad;
+  letter-spacing: 0.3px;
+  transition: all 0.3s ease;
+  border: none;
+  background: transparent;
+}
+.logs-tag-row .seg button:hover {
+  color: #fff;
+  background: rgba(20, 184, 166, 0.1);
+}
+.logs-tag-row .seg button.active {
+  background: linear-gradient(90deg, #14b8a6, #06b6d4);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(20,184,166,0.2);
+}
+.logs-tag-row .seg button .tag-count {
+  display: none !important;
+}
+
+.term{flex:1;min-height:340px;display:flex;flex-direction:column;border-radius:18px;border:1px solid var(--line);background:rgba(4,12,16,.82);overflow:hidden}
+.term-head{padding:14px 20px;border-bottom:1px solid var(--line);background:rgba(8,26,32,.85);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cyan);display:flex;align-items:center;gap:12px;letter-spacing:.5px;font-weight:600}
+.term-dots{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.term-dots span{width:12px;height:12px;border-radius:50%;display:block;transition:all .3s ease}
+.term-dots .d1{background:#f87171;box-shadow:0 0 8px rgba(248,113,113,.6)}
+.term-dots .d2{background:#fbbf24;box-shadow:0 0 8px rgba(251,191,36,.6)}
+.term-dots .d3{background:#34d399;box-shadow:0 0 8px rgba(52,211,153,.6)}
+.term-head:hover .term-dots span{transform:scale(1.15)}
+.term-title-text{color:var(--cyan);font-weight:700;letter-spacing:.5px}
+.term-title-text::before{content:'> ';color:var(--violet);margin-right:2px}
+.term-count{margin-left:auto;font-size:11px;color:var(--dim);font-weight:600;font-family:'JetBrains Mono',monospace}
+.term-body{padding:14px 18px;overflow-y:auto;flex:1;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.75;color:#d4ede8;min-height:220px}
+.term-body::-webkit-scrollbar{width:6px}
+.term-body::-webkit-scrollbar-thumb{background:rgba(20,184,166,.3);border-radius:3px}
+.term-body::-webkit-scrollbar-track{background:transparent}
+
+.log{display:flex;gap:10px;margin-bottom:5px;word-break:break-word;padding:3px 8px;border-radius:6px;transition:background .2s}
+.log:hover{background:rgba(20,184,166,.06)}
+.log-ts{color:var(--violet);flex-shrink:0;font-weight:600}
+.log-msg{flex:1;word-break:break-word}
+.log-msg.success{color:var(--ok)}
+.log-msg.warning{color:var(--warn)}
+.log-msg.error{color:var(--err)}
+.log-msg.info{color:#d4ede8}
+
+.log.cat-error{background:rgba(251,113,133,.07);border-left:3px solid var(--err);padding-left:11px}
+.log.cat-success{background:rgba(52,211,153,.05);border-left:3px solid var(--ok);padding-left:11px}
+.log.cat-warning{background:rgba(251,191,36,.06);border-left:3px solid var(--warn);padding-left:11px}
+
+.term-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;min-height:220px;color:var(--dim);text-align:center;padding:20px}
+.term-empty i{font-size:34px;margin-bottom:14px;color:var(--violet);opacity:.65}
+.term-empty p{font-size:13.5px;font-weight:700;color:var(--text)}
+.term-empty small{font-size:11.5px;color:var(--dim);margin-top:6px;display:block}
+
+.modal{position:fixed;inset:0;z-index:100;background:rgba(3,10,16,.78);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:var(--ease);overflow-y:auto}
+.modal.active{opacity:1;pointer-events:all}
+.card{width:100%;max-width:560px;max-height:92vh;overflow-y:auto;background:rgba(6,22,26,.98);border:1px solid var(--line-h);border-radius:20px;padding:26px;transform:translateY(30px) scale(.96);transition:var(--ease);box-shadow:0 40px 100px rgba(0,0,0,.7);position:relative;margin:auto}
+.card::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:var(--grad);border-radius:20px 20px 0 0}
+.modal.active .card{transform:none}
+.card h2{font-size:20px;font-weight:800;margin-bottom:6px}
+.card p{color:var(--dim);font-size:13px;margin-bottom:20px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:8px}
+.field input,.field select,.field textarea{width:100%;padding:12px;border-radius:10px;background:rgba(5,16,20,.6);border:1px solid var(--line);color:#fff;font-size:14px;outline:none;transition:var(--ease)}
+.field textarea{min-height:100px;resize:vertical;font-family:'JetBrains Mono',monospace}
+.field select option{background:#0d2030}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--violet);box-shadow:0 0 0 3px rgba(20,184,166,.18)}
+.card-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+
+.drop-zone{border:2px dashed var(--line-h);border-radius:14px;padding:26px 18px;text-align:center;cursor:pointer;transition:var(--ease);background:rgba(20,184,166,.04)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--violet);background:rgba(20,184,166,.1)}
+.drop-zone i{font-size:30px;color:var(--cyan);margin-bottom:10px;display:block}
+.drop-zone p{color:var(--text);font-weight:600;font-size:14px;margin-bottom:4px}
+.drop-zone small{color:var(--dim);font-size:11px;display:block}
+.file-info{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(20,184,166,.08);border:1px solid var(--line-h);margin-top:12px;font-size:12.5px;color:var(--cyan);font-family:'JetBrains Mono',monospace}
+.file-info i{font-size:16px}
+.paste-label{font-size:12px;font-weight:700;color:var(--cyan);margin-top:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.paste-area{width:100%;min-height:80px;padding:10px 12px;border-radius:10px;background:rgba(5,16,20,.6);border:1px solid var(--line);color:#fff;font-size:12px;font-family:'JetBrains Mono',monospace;resize:vertical;outline:none}
+.paste-area:focus{border-color:var(--violet)}
+.import-header{display:flex;justify-content:space-between;align-items:center;margin-top:16px;margin-bottom:8px;font-size:12.5px;font-weight:700}
+.import-header .count{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:13px}
+.import-list{max-height:320px;overflow-y:auto;border-radius:12px;background:rgba(5,16,20,.5);border:1px solid var(--line)}
+.import-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.05);font-family:'JetBrains Mono',monospace;font-size:12px}
+.import-row:last-child{border-bottom:0}
+.import-row .idx{color:var(--violet);font-weight:700;min-width:22px}
+.import-row .info{flex:1;min-width:0}
+.import-row .uid-line{color:#67e8f9;font-weight:700;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.import-row .pwd-line{color:var(--dim);font-size:10.5px;display:flex;align-items:center;gap:5px;margin-top:2px;flex-wrap:wrap}
+.import-row .pwd-line .ok{color:var(--ok);font-weight:700}
+.import-row .deploy-btn{padding:7px 14px;border-radius:9px;background:var(--grad);color:#fff;border:0;font-size:11px;font-weight:800;cursor:pointer;transition:var(--ease);flex-shrink:0;letter-spacing:.3px}
+.import-row .deploy-btn:hover{box-shadow:0 4px 14px rgba(20,184,166,.5);transform:scale(1.05)}
+.import-row .deploy-btn.done{background:linear-gradient(135deg,#34d399,#10b981);pointer-events:none}
+.import-row .deploy-btn.error{background:linear-gradient(135deg,#fb7185,#f43f5e)}
+.import-row .row-del{padding:7px 10px;border-radius:9px;background:rgba(251,113,133,.12);color:var(--err);border:1px solid rgba(251,113,133,.35);font-size:11px;cursor:pointer;flex-shrink:0;transition:var(--ease)}
+.import-row .row-del:hover{background:rgba(251,113,133,.25);transform:scale(1.05)}
+.import-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.import-status-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.3);margin-top:12px;font-size:11.5px;color:var(--ok);font-weight:700}
+.import-status-bar i{font-size:13px}
+
+.toasts{position:fixed;bottom:max(20px,env(safe-area-inset-bottom));right:20px;left:20px;z-index:200;display:flex;flex-direction:column;align-items:flex-end;gap:10px;pointer-events:none}
+.toast{max-width:100%;background:rgba(8,26,32,.97);border:1px solid var(--line);border-left:4px solid var(--violet);padding:12px 16px;border-radius:12px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:tin .3s ease;pointer-events:auto}
+.toast.success{border-left-color:var(--ok)}
+.toast.error{border-left-color:var(--err)}
+.toast.warning{border-left-color:var(--warn)}
+.toast.hide{opacity:0;transform:translateX(30px);transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateX(40px)}}
+
+@media(max-width:600px){
+  .topbar{padding:10px 14px}.pill span{display:none}.pill{padding:9px}
+  .metrics{grid-template-columns:repeat(4,1fr);gap:4px}
+  .metric{padding:5px 2px}
+  .metric span{font-size:6.5px}
+  .metric strong{font-size:9px}
+  .top-actions .btn{padding:12px 6px;font-size:11.5px}
+  .top-actions .btn i{font-size:14px}
+  .page-head .row .btn{flex:1;justify-content:center}
+  .stats{grid-template-columns:1fr 1fr;gap:12px}
+  .stat{padding:16px}
+  .stat-icon{width:36px;height:36px;font-size:15px;margin-bottom:10px}
+  .stat-val{font-size:22px}
+  .chart-svg{height:150px}
+  .card{padding:20px}
+  .grid{grid-template-columns:1fr;gap:10px}
+  .node{padding:12px 14px}
+  .avatar{width:32px;height:32px;font-size:13px}
+  .lvl{font-size:8px;padding:1px 4px}
+  .name{font-size:12px}
+  .name span:first-child{max-width:95px}
+  .uid{font-size:9px}
+  .badge{font-size:8.5px;padding:3px 7px}
+  .act{width:26px;height:26px;font-size:9px}
+  .time{font-size:9px}
+  .prog-top,.prog-bot{font-size:8.5px}
+
+  .logs-top-actions{gap:8px}
+  .logs-top-actions .btn{padding:12px 6px;font-size:10.5px;gap:6px;border-radius:10px;letter-spacing:.4px}
+  .logs-top-actions .btn i{font-size:14px}
+  
+  .logs-tag-row .seg button { padding: 8px 14px; font-size: 12.5px; } 
+
+  .term-head{padding:12px 14px;font-size:11.5px;gap:10px}
+  .term-dots{gap:6px}
+  .term-dots span{width:10px;height:10px}
+  .term-body{padding:12px 14px;font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<header class="topbar">
+  <button class="menu-btn" id="menuBtn"><i class="fa-solid fa-bars"></i></button>
+  <div class="top-title"><span id="topTitle">Dashboard</span><small>Level Up System</small></div>
+  <div class="pill" id="pill"><i class="dot"></i><span id="sideStatusTop">ONLINE</span></div>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+    <div><div class="brand-name">LEVEL UP</div><div class="brand-sub">Real-Time Dashboard</div></div>
+  </div>
+  <div class="nav">
+    <button class="nav-item active" data-page="core" data-title="Dashboard"><i class="fa-solid fa-gauge-high"></i>Dashboard</button>
+    <button class="nav-item" data-page="targets" data-title="Bot Accounts"><i class="fa-solid fa-robot"></i>Bot Accounts</button>
+    <button class="nav-item" data-page="terminal" data-title="Live Logs"><i class="fa-solid fa-scroll"></i>Live Logs</button>
+  </div>
+  <div class="side-foot">Status<b id="sideStatus">ONLINE</b></div>
+</nav>
+
+<main class="main">
+  <section id="page-core" class="page active">
+    <div class="page-head">
+      <div><h1 class="page-title">Dashboard</h1><p class="page-sub">Live system overview</p></div>
+      <!-- Discord-style refresh button with id for animation -->
+      <button class="btn primary" id="refresh-dashboard-btn" onclick="refreshDashboard(this)"><i class="fa-solid fa-rotate"></i>Refresh</button>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-play"></i></div>
+        <div class="stat-val" id="stat-started">0</div>
+        <div class="stat-label">Matches Started</div>
+        <div class="stat-foot" id="stat-started-sub">~0 / hour</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-crosshairs"></i></div>
+        <div class="stat-val" id="stat-playing">0</div>
+        <div class="stat-label">Playing Now</div>
+        <div class="stat-foot" id="stat-playing-sub">across all accounts</div>
+      </div>
+      <div class="stat" style="border-color:rgba(52,211,153,.35)">
+        <div class="stat-icon" style="background:linear-gradient(135deg,rgba(52,211,153,.25),rgba(16,185,129,.20));color:#34d399"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-val" id="stat-completed" style="color:#34d399">0</div>
+        <div class="stat-label">Matches Completed</div>
+        <div class="stat-foot" id="stat-completed-sub" style="color:#34d399">~0 / hour</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        <div class="stat-val" id="stat-exp">+0</div>
+        <div class="stat-label">Total EXP Gained</div>
+        <div class="stat-foot" id="stat-exp-sub">~0 / hour</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        <div class="stat-val" id="stat-accounts">0</div>
+        <div class="stat-label">Active Nodes</div>
+        <div class="stat-foot" id="stat-online">0 online</div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-clock"></i></div>
+        <div class="stat-val" id="stat-uptime">00:00:00</div>
+        <div class="stat-label">System Uptime</div>
+        <div class="stat-foot">since boot</div>
+      </div>
+    </div>
+
+    <div class="chart-wrap">
+      <div class="chart-head">
+        <h3><i class="fa-solid fa-chart-line"></i>EXP PROGRESS LIVE</h3>
+        <small id="chart-info">Realtime</small>
+      </div>
+      <svg class="chart-svg" id="chart" viewBox="0 0 800 180" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="lg" x1="0" x2="1">
+            <stop offset="0" stop-color="#14b8a6"/>
+            <stop offset="0.5" stop-color="#06b6d4"/>
+            <stop offset="1" stop-color="#67e8f9"/>
+          </linearGradient>
+          <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#06b6d4" stop-opacity=".7"/>
+            <stop offset="1" stop-color="#14b8a6" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path class="fill" id="chartFill" d=""/>
+        <path class="line" id="chartLine" d=""/>
+        <circle id="chartDot" cx="0" cy="0" r="5" style="display:none"/>
+      </svg>
+    </div>
+  </section>
+
+  <section id="page-targets" class="page">
+    <div class="page-head">
+      <div><h1 class="page-title">Bot Accounts</h1><p class="page-sub">Manage connected accounts</p></div>
+    </div>
+
+    <div class="top-actions">
+      <!-- Bot Accounts refresh button with id for animation -->
+      <button class="btn" id="refresh-bot-btn" onclick="refreshBotAccounts(this)"><i class="fa-solid fa-rotate"></i>Refresh</button>
+      <button class="btn warn" id="btn-pause-all" onclick="togglePauseAll()"><i class="fa-solid fa-pause"></i>Pause All</button>
+      <button class="btn danger" onclick="clearAllAccounts()"><i class="fa-solid fa-trash"></i>Clear All</button>
+      <button class="btn" onclick="openImportModal()"><i class="fa-solid fa-file-import"></i>Import File</button>
+    </div>
+
+    <button class="btn primary add-new-btn" onclick="openAddModal()">
+      <i class="fa-solid fa-plus"></i> Add New
+    </button>
+
+    <div class="controls">
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="account-search" type="text" placeholder="Search UID or nickname..." oninput="onSearch()"></div>
+      <div class="seg" id="nodeFilters">
+        <button class="active" onclick="setFilter('all',this)">All</button>
+        <button onclick="setFilter('in_match',this)">Match</button>
+        <button onclick="setFilter('online',this)">Online</button>
+        <button onclick="setFilter('paused',this)">Paused</button>
+      </div>
+    </div>
+    <div class="grid" id="accounts-container">
+      <div class="empty"><i class="fa-solid fa-circle-notch fa-spin"></i>Loading accounts...</div>
+    </div>
+  </section>
+
+  <section id="page-terminal" class="page">
+    <div class="page-head">
+      <div><h1 class="page-title">Live Logs</h1><p class="page-sub">Real-time backend activity</p></div>
+    </div>
+
+    <div class="logs-top-actions">
+      <button class="btn primary" id="btn-autoscroll" onclick="toggleAutoScroll()">
+        <i class="fa-solid fa-arrow-down"></i>
+        <span>AUTO-<br>SCROLL</span>
+      </button>
+      <button class="btn danger" onclick="clearLogs()">
+        <i class="fa-solid fa-trash"></i>
+        <span>CLEAR-<br>LOGS</span>
+      </button>
+      <button class="btn warn" onclick="showPersisted()">
+        <i class="fa-solid fa-broom"></i>
+        <span>CLEAN-<br>FAILED</span>
+      </button>
+    </div>
+
+    <div class="logs-tag-row">
+      <div class="seg" id="logFilters">
+        <button class="active" data-filter="all" onclick="setLogFilter('all',this)">All<span class="tag-count" id="cnt-all">0</span></button>
+        <button data-filter="account" onclick="setLogFilter('account',this)">Account<span class="tag-count" id="cnt-account">0</span></button>
+        <button data-filter="match" onclick="setLogFilter('match',this)">Match<span class="tag-count" id="cnt-match">0</span></button>
+        <button data-filter="exp" onclick="setLogFilter('exp',this)">EXP<span class="tag-count" id="cnt-exp">0</span></button>
+        <button data-filter="error" onclick="setLogFilter('error',this)">Error<span class="tag-count" id="cnt-error">0</span></button>
+      </div>
+    </div>
+
+    <div class="term">
+      <div class="term-head">
+        <div class="term-dots">
+          <span class="d1"></span>
+          <span class="d2"></span>
+          <span class="d3"></span>
+        </div>
+        <span class="term-title-text">Upgrade_Status</span>
+        <span class="term-count" id="termCount">0 logs</span>
+      </div>
+      <div class="term-body" id="console-stream" onscroll="handleLogScroll()">
+        <div class="term-empty">
+          <i class="fa-solid fa-satellite-dish"></i>
+          <p>Waiting for logs...</p>
+          <small>Activity will appear here in real-time</small>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="addModal">
+  <div class="card">
+    <h2>Add New Node</h2>
+    <p>Enter credentials to deploy a new bot instance.</p>
+    <form onsubmit="submitAdd(event)">
+      <div class="field"><label>Auth Type</label>
+        <select id="acc-type" onchange="toggleFormType()">
+          <option value="guest">Guest (UID / Password)</option>
+          <option value="token">Access Token</option>
+        </select></div>
+      <div id="guest-inputs">
+        <div class="field"><label>UID</label><input type="text" id="acc-uid" placeholder="Enter UID" autocomplete="off"></div>
+        <div class="field"><label>Password</label><input type="text" id="acc-password" placeholder="Enter password" autocomplete="off"></div>
+      </div>
+      <div id="token-inputs" style="display:none"><div class="field"><label>Access Token</label><textarea id="acc-token" placeholder="Paste the full token here..."></textarea></div></div>
+      <div class="card-actions">
+        <button type="button" class="btn" onclick="closeAddModal()">Cancel</button>
+        <button type="submit" class="btn primary"><i class="fa-solid fa-rocket"></i>Deploy</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- UPDATED IMPORT MODAL -->
+<div class="modal" id="importModal">
+  <div class="card" style="max-width:580px;">
+    <h2>📁 Import Accounts</h2>
+    <p>Upload a file OR paste text — UID & Password auto-detected. Saved until you clear.</p>
+
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <i class="fa-solid fa-cloud-arrow-up"></i>
+      <p>Click to choose file</p>
+      <small>or drag & drop here · max 5MB</small>
+    </div>
+    <input type="file" id="fileInput" style="display:none" onchange="handleFileSelect(event)">
+    <div id="fileInfo" style="display:none" class="file-info">
+      <i class="fa-solid fa-file-code"></i>
+      <span id="fileName">file.txt</span>
+      <span id="fileSize" style="margin-left:auto;color:var(--dim)">0 KB</span>
+    </div>
+
+    <div class="paste-label"><i class="fa-solid fa-paste"></i> Or Paste Content</div>
+    <textarea class="paste-area" id="pasteArea" placeholder='Paste JSON, key=value, or lines like:
+com.garena.msdk.guest_uid=123456789
+com.garena.msdk.guest_password=abc123' oninput="onPasteInput()"></textarea>
+
+    <!-- NEW FORMAT: BUTTONS MOVED TO THE TOP -->
+    <div id="importResult" style="display:none; margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(20,184,166,.08); padding:12px 14px; border-radius:12px; border:1px solid rgba(20,184,166,.3); margin-bottom:12px; flex-wrap:wrap; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px; font-weight:800; color:var(--cyan);"><i class="fa-solid fa-file-code"></i> <span id="importFormat">Detected</span></span>
+          <span class="count" id="importCount" style="background:linear-gradient(135deg,#14b8a6,#06b6d4); color:#fff; font-size:11px; padding:3px 8px; border-radius:6px; font-family:'JetBrains Mono',monospace; font-weight:bold;">0 account(s)</span>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn primary" style="padding:8px 12px; font-size:12px;" onclick="deployAllImported()"><i class="fa-solid fa-rocket"></i> Deploy All</button>
+          <button class="btn warn" style="padding:8px 12px; font-size:12px;" onclick="clearImportList()"><i class="fa-solid fa-trash-can"></i> Clear List</button>
+          <button class="btn" style="padding:8px 12px; font-size:12px;" onclick="closeImportModal()"><i class="fa-solid fa-xmark"></i> Close</button>
+        </div>
+      </div>
+      <div class="import-list" id="importList"></div>
+    </div>
+
+    <!-- THIS WILL HIDE WHEN IMPORT RESULTS SHOW -->
+    <div class="card-actions" id="importModalFooter">
+      <button type="button" class="btn" onclick="closeImportModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="confirmModal">
+  <div class="card" style="max-width:420px;text-align:center">
+    <div id="confirmIcon" style="width:70px;height:70px;margin:0 auto 18px;border-radius:50%;background:rgba(251,113,133,.15);border:2px solid rgba(251,113,133,.5);display:grid;place-items:center;font-size:28px;color:var(--err)">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+    <h2 id="confirmTitle" style="font-size:20px;margin-bottom:10px">Confirm</h2>
+    <p id="confirmMsg" style="margin-bottom:14px">Are you sure?</p>
+    <div id="confirmBody"></div>
+    <div class="card-actions" style="margin-top:22px">
+      <button class="btn" onclick="closeConfirm()" style="flex:1"><i class="fa-solid fa-xmark"></i>Cancel</button>
+      <button class="btn primary" id="confirmOkBtn" style="flex:1;background:linear-gradient(135deg,#fb7185,#f43f5e);box-shadow:0 8px 24px rgba(244,63,94,.4)"><i class="fa-solid fa-trash"></i>Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toastBox"></div>
+
+<script>
+'use strict';
+
+const LS_KEY_IMPORT_LIST = 'lvlup_import_list_v1';
+const LS_KEY_IMPORT_FILE = 'lvlup_import_file_v1';
+
+let STATE = { accounts: [], logs: [], exp_history: [], filter: 'all', logFilter: 'all' };
+let autoScroll = true;
+let lastLevels = {};
+let _lastRenderHash = {};
+let _lastLogHash = '';
+let _lastChartHash = '';
+let _fetchInFlight = false;
+let _searchTimer = null;
+let UPTIME_BASE = 0;
+let UPTIME_LOCAL = Date.now();
+let IMPORTED_ACCOUNTS = [];
+let _currentFile = null;
+
+// Helper to add/remove refreshing class for Discord-style spin
+function setRefreshing(btn, active) {
+  if (!btn) return;
+  if (active) btn.classList.add('refreshing');
+  else btn.classList.remove('refreshing');
+}
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+const fmt = n => Number(n || 0).toLocaleString();
+
+function categorizeLog(log){
+  const lvl = String(log.level || 'info').toLowerCase();
+  const msg = String(log.message || '').toLowerCase();
+
+  if(lvl === 'error' || lvl === 'warning') return 'error';
+  if(msg.includes('failed') || msg.includes('error') || msg.includes('exception') ||
+     msg.includes('timeout') || msg.includes('rejected') || msg.includes('invalid')) return 'error';
+
+  if(msg.includes('exp') || msg.includes('★') || msg.includes('🎉') ||
+     msg.includes('level up') || msg.includes('harvest') || msg.includes('gained')) return 'exp';
+
+  if(msg.includes('match') || msg.includes('⚔') || msg.includes('🎮') ||
+     msg.includes('🚀') || msg.includes('✅') || msg.includes('udp') ||
+     msg.includes('handshake') || msg.includes('lone wolf') || msg.includes('startmatch') ||
+     msg.includes('thunder') || msg.includes('sharma') || msg.includes('searching') ||
+     msg.includes('completed') || msg.includes('played')) return 'match';
+
+  if(msg.includes('login') || msg.includes('cache') || msg.includes('account') ||
+     msg.includes('uid') || msg.includes('token') || msg.includes('deleted') ||
+     msg.includes('paused') || msg.includes('resumed') || msg.includes('restart') ||
+     msg.includes('session') || msg.includes('worker') || msg.includes('majorlogin') ||
+     msg.includes('getlogin') || msg.includes('clean') || msg.includes('add')) return 'account';
+
+  return 'info';
+}
+
+function getLogsByFilter(filter){
+  const logs = STATE.logs || [];
+  if(filter === 'all') return logs;
+  return logs.filter(l => categorizeLog(l) === filter);
+}
+
+function updateTagCounts(){
+  const logs = STATE.logs || [];
+  let counts = { all: logs.length, account: 0, match: 0, exp: 0, error: 0 };
+  for(const l of logs){
+    const c = categorizeLog(l);
+    if(counts[c] !== undefined) counts[c]++;
+  }
+  const map = { 'all': 'cnt-all', 'account': 'cnt-account', 'match': 'cnt-match', 'exp': 'cnt-exp', 'error': 'cnt-error' };
+  for(const [key, elId] of Object.entries(map)){
+    const el = $(elId);
+    if(el) el.textContent = counts[key] || 0;
+  }
+}
+
+function saveImportState(){
+  try{
+    localStorage.setItem(LS_KEY_IMPORT_LIST, JSON.stringify(IMPORTED_ACCOUNTS));
+    if(_currentFile){
+      localStorage.setItem(LS_KEY_IMPORT_FILE, JSON.stringify({ name: _currentFile.name, size: _currentFile.size }));
+    } else {
+      localStorage.removeItem(LS_KEY_IMPORT_FILE);
+    }
+  }catch(e){ console.warn('saveImportState failed:', e); }
+}
+
+function loadImportState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY_IMPORT_LIST);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)) IMPORTED_ACCOUNTS = parsed.filter(x => x && x.uid && x.password);
+    }
+    const fi = localStorage.getItem(LS_KEY_IMPORT_FILE);
+    if(fi){
+      const meta = JSON.parse(fi);
+      _currentFile = { name: meta.name || 'file', size: meta.size || 0 };
+    }
+  }catch(e){ console.warn('loadImportState failed:', e); }
+}
+
+function restoreImportUI(){
+  if(IMPORTED_ACCOUNTS.length === 0){
+    $('importResult').style.display = 'none';
+    $('importModalFooter').style.display = 'flex';
+    return;
+  }
+  if(_currentFile){
+    $('fileInfo').style.display = 'flex';
+    $('fileName').textContent = _currentFile.name;
+    $('fileSize').textContent = (_currentFile.size / 1024).toFixed(1) + ' KB';
+  }
+  $('importFormat').textContent = localStorage.getItem('lvlup_import_format') || 'Saved';
+  $('importResult').style.display = 'block';
+  $('importModalFooter').style.display = 'none';
+  renderImportList();
+}
+
+function toast(msg, type='info'){
+  const box = $('toastBox');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  const ic = type==='success' ? '<i class="fa-solid fa-check" style="color:var(--ok)"></i>'
+           : type==='error' ? '<i class="fa-solid fa-triangle-exclamation" style="color:var(--err)"></i>'
+           : type==='warning' ? '<i class="fa-solid fa-exclamation" style="color:var(--warn)"></i>'
+           : '<i class="fa-solid fa-circle-info" style="color:var(--violet)"></i>';
+  el.innerHTML = `${ic}<span>${esc(msg)}</span>`;
+  box.appendChild(el);
+  setTimeout(() => { el.classList.add('hide'); setTimeout(() => el.remove(), 350); }, 3500);
+}
+
+function fmtDur(sec){
+  sec = Math.max(0, Math.floor(Number(sec) || 0));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  const p = n => String(n).padStart(2,'0');
+  return h > 0 ? `${h}h ${p(m)}m` : `${p(m)}m ${p(s)}s`;
+}
+function fmtUptime(sec){
+  sec = Math.max(0, Math.floor(Number(sec)||0));
+  const h = Math.floor(sec/3600), m = Math.floor((sec%3600)/60), s = sec%60;
+  const p = n => String(n).padStart(2,'0');
+  return `${p(h)}:${p(m)}:${p(s)}`;
+}
+
+async function post(url, body){
+  const r = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const text = await r.text();
+  try { return JSON.parse(text); }
+  catch(e){ return { status: 'error', error: 'Invalid server response: ' + text.slice(0,100) }; }
+}
+
+async function fetchStats(){
+  if(_fetchInFlight) return;
+  _fetchInFlight = true;
+  try{
+    const r = await fetch('/api/stats?t=' + Date.now());
+    if(!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    STATE.accounts = Array.isArray(d.accounts) ? d.accounts : [];
+    STATE.logs = Array.isArray(d.logs) ? d.logs : [];
+    STATE.exp_history = Array.isArray(d.exp_history) ? d.exp_history : [];
+    renderStats(d);
+    renderChart();
+    renderAccounts();
+    renderLogs();
+    setOnline(true);
+  }catch(e){
+    console.error('fetchStats error:', e);
+    setOnline(false);
+  } finally {
+    _fetchInFlight = false;
+  }
+}
+
+function setOnline(on){
+  $('pill').classList.toggle('off', !on);
+  $('sideStatusTop').textContent = on ? 'ONLINE' : 'OFFLINE';
+  const s2 = $('sideStatus');
+  s2.textContent = on ? 'ONLINE' : 'OFFLINE';
+  s2.style.color = on ? 'var(--ok)' : 'var(--err)';
+}
+
+function animateNum(el, target, prefix=''){
+  const cur = parseInt(String(el.dataset.n || '0').replace(/\D/g,'')) || 0;
+  if(cur === target){ el.textContent = prefix + fmt(target); return; }
+  el.dataset.n = target;
+  const start = performance.now();
+  const dur = 500;
+  const tick = t => {
+    const k = Math.min(1, (t - start)/dur);
+    const e = 1 - Math.pow(1-k, 3);
+    el.textContent = prefix + fmt(Math.round(cur + (target-cur)*e));
+    if(k < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function renderStats(d){
+  const playing = d.total_active_matches || 0;
+  const started = d.total_matches_started || 0;
+  const completed = d.total_matches_completed || d.total_matches_finished || 0;
+  const exp = d.total_gained_exp || 0;
+  const accounts = d.total_accounts || 0;
+  const online = STATE.accounts.filter(a => !a.is_paused && (a.status === 'ONLINE' || a.status === 'IN_MATCH' || a.status === 'SEARCHING')).length;
+
+  animateNum($('stat-playing'), playing);
+  animateNum($('stat-started'), started);
+  animateNum($('stat-completed'), completed);
+  animateNum($('stat-exp'), exp, '+');
+  animateNum($('stat-accounts'), accounts);
+
+  const uptimeSec = Math.max(1, d.uptime || 1);
+  const completedPerHour = d.matches_completed_per_hour || Math.round((completed / uptimeSec) * 3600);
+
+  $('stat-playing-sub').textContent = playing > 0 ? `⚡ ${playing} live now` : 'across all accounts';
+  $('stat-started-sub').textContent = `~${d.matches_per_hour || 0} / hour`;
+  $('stat-completed-sub').textContent = `~${completedPerHour} / hour`;
+  $('stat-exp-sub').textContent = `~${fmt(d.exp_per_hour || 0)} / hour`;
+  $('stat-online').textContent = `${online} online`;
+
+  UPTIME_BASE = d.uptime || 0;
+  UPTIME_LOCAL = Date.now();
+  $('stat-uptime').textContent = fmtUptime(UPTIME_BASE);
+}
+
+setInterval(() => {
+  const el = Math.floor((Date.now() - UPTIME_LOCAL)/1000) + UPTIME_BASE;
+  const node = $('stat-uptime');
+  if(node){
+    const t = fmtUptime(el);
+    if(node.textContent !== t) node.textContent = t;
+  }
+}, 1000);
+
+function renderChart(){
+  const data = STATE.exp_history || [];
+  const line = $('chartLine');
+  const fill = $('chartFill');
+  const dot = $('chartDot');
+  const info = $('chart-info');
+  if(!line) return;
+
+  const lastPoint = data[data.length-1];
+  const hash = data.length + '|' + (lastPoint?.exp || 0) + '|' + (lastPoint?.t || 0);
+  if(hash === _lastChartHash) return;
+  _lastChartHash = hash;
+
+  if(data.length < 2){
+    info.textContent = 'Realtime';
+    line.setAttribute('d','');
+    fill.setAttribute('d','');
+    dot.style.display = 'none';
+    return;
+  }
+
+  const chartData = data;
+  const W = 800, H = 180, pad = 14;
+  const tMin = chartData[0].t, tMax = chartData[chartData.length-1].t;
+  const vMin = 0, vMax = Math.max(...chartData.map(d => d.exp)) || 1;
+  const x = t => pad + ((t - tMin) / Math.max(1, tMax - tMin)) * (W - 2*pad);
+  const y = v => H - pad - ((v - vMin) / Math.max(1, vMax - vMin)) * (H - 2*pad);
+
+  let d = '';
+  chartData.forEach((p, i) => {
+    d += (i === 0 ? 'M' : 'L') + x(p.t).toFixed(1) + ',' + y(p.exp).toFixed(1) + ' ';
+  });
+  line.setAttribute('d', d.trim());
+
+  let f = `M${x(chartData[0].t).toFixed(1)},${(H-pad).toFixed(1)} `;
+  chartData.forEach(p => { f += `L${x(p.t).toFixed(1)},${y(p.exp).toFixed(1)} `; });
+  f += `L${x(chartData[chartData.length-1].t).toFixed(1)},${(H-pad).toFixed(1)} Z`;
+  fill.setAttribute('d', f);
+
+  const last = chartData[chartData.length-1];
+  dot.setAttribute('cx', x(last.t).toFixed(1));
+  dot.setAttribute('cy', y(last.exp).toFixed(1));
+  dot.style.display = '';
+
+  const delta = last.exp - chartData[0].exp;
+  info.textContent = `+${fmt(delta)} EXP`;
+}
+
+function setFilter(f, btn){
+  STATE.filter = f;
+  document.querySelectorAll('#nodeFilters button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _lastRenderHash = {};
+  renderAccounts();
+}
+
+function onSearch(){
+  if(_searchTimer) clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => { _lastRenderHash = {}; renderAccounts(); }, 200);
+}
+
+function renderAccounts(){
+  const q = ($('account-search').value || '').toLowerCase().trim();
+  const box = $('accounts-container');
+
+  const list = STATE.accounts.filter(a => {
+    const uid = String(a.uid || '').toLowerCase();
+    const nick = String(a.nickname || '').toLowerCase();
+    const paused = !!a.is_paused;
+    const status = String(a.status || '').toUpperCase();
+    if(q && !uid.includes(q) && !nick.includes(q)) return false;
+    if(STATE.filter === 'in_match') return status === 'IN_MATCH' && !paused;
+    if(STATE.filter === 'online') return !paused && (status === 'ONLINE' || status === 'IN_MATCH' || status === 'SEARCHING');
+    if(STATE.filter === 'paused') return paused;
+    return true;
+  });
+
+  const allPaused = STATE.accounts.length > 0 && STATE.accounts.every(a => a.is_paused);
+  $('btn-pause-all').innerHTML = allPaused
+    ? '<i class="fa-solid fa-play"></i>Resume All'
+    : '<i class="fa-solid fa-pause"></i>Pause All';
+
+  if(list.length === 0){
+    box.innerHTML = `<div class="empty"><i class="fa-solid fa-ghost"></i>${STATE.accounts.length === 0 ? 'No nodes yet.<br>Click <b>Add New</b> or <b>Import File</b> to start.' : 'No matching nodes.'}</div>`;
+    _lastRenderHash = {};
+    return;
+  }
+
+  const activeUids = new Set(list.map(a => String(a.uid)));
+  box.querySelectorAll('.node').forEach(n => { if(!activeUids.has(n.dataset.uid)) n.remove(); });
+  const empty = box.querySelector('.empty');
+  if(empty) empty.remove();
+
+  list.forEach(a => {
+    const uid = String(a.uid);
+    const hash = [a.level, a.current_exp, a.gained_exp, a.active_matches, a.matches_played, a.status, a.is_paused, a.mode, Math.floor((a.uptime_seconds||0)/30)].join('|');
+    let card = box.querySelector(`.node[data-uid="${CSS.escape(uid)}"]`);
+    if(card && _lastRenderHash[uid] === hash){
+      const timeEl = card.querySelector('.time');
+      if(timeEl){
+        const html = `<i class="fa-solid fa-stopwatch"></i> ${fmtDur(a.uptime_seconds || 0)}`;
+        if(timeEl.innerHTML !== html) timeEl.innerHTML = html;
+      }
+      return;
+    }
+    if(!card){ card = document.createElement('div'); card.className = 'node'; card.dataset.uid = uid; box.appendChild(card); }
+    _lastRenderHash[uid] = hash;
+    updateCard(card, a);
+  });
+}
+
+function updateCard(card, a){
+  const uid = String(a.uid);
+  const level = Math.max(1, parseInt(a.level) || 1);
+  const nextLvl = a.next_level || Math.min(100, level + 1);
+  const earned = a.earned_in_level || 0;
+  const needed = a.needed_for_level || 1;
+  const remaining = a.remaining_exp || 0;
+  const pct = a.progress_pct || 0;
+  const gained = a.gained_exp || 0;
+  const startExp = a.initial_exp || 0;
+  const liveExp = a.current_exp || 0;
+  const paused = !!a.is_paused;
+  const status = paused ? 'PAUSED' : (a.status || 'ONLINE');
+  const matches = a.matches_played || 0;
+  const activeMatches = a.active_matches || 0;
+  const uptime = a.uptime_seconds || 0;
+
+  const mode = String(a.mode || 'LONE_WOLF').toUpperCase();
+  const isBR = mode === 'BR';
+  const modeName = isBR ? 'BR' : 'LONE WOLF';
+  const modeIcon = isBR ? 'fa-plane' : 'fa-paw';
+  const modeClass = isBR ? 'br' : 'lonewolf';
+
+  const totalPlayed = matches;
+  const matchNumber = matches + activeMatches;
+
+  const prevLvl = lastLevels[uid];
+  if(prevLvl !== undefined && level > prevLvl){
+    toast(`🎉 ${a.nickname || uid} reached Level ${level}!`, 'success');
+  }
+  lastLevels[uid] = level;
+
+  let statusCls = 's-online', statusIc = 'fa-globe';
+  if(paused){ statusCls = 's-paused'; statusIc = 'fa-pause'; }
+  else if(status === 'IN_MATCH'){ statusCls = `s-match ${modeClass}`; statusIc = modeIcon; }
+  else if(status === 'SEARCHING'){ statusCls = 's-error'; statusIc = 'fa-magnifying-glass'; }
+
+  const statusText = paused ? 'PAUSED'
+    : status === 'IN_MATCH' ? `${modeName} #${matchNumber}`
+    : status === 'ONLINE' ? 'ONLINE'
+    : status === 'SEARCHING' ? 'SEARCHING' : status;
+
+  card.innerHTML = `
+    <div class="node-head">
+      <div class="who">
+        <div class="avatar"><i class="fa-solid fa-user-astronaut"></i><span class="lvl">L${level}</span></div>
+        <div style="min-width:0">
+          <div class="name">
+            <span>${esc(a.nickname || 'Unknown')}</span>
+            <span class="region">${esc(a.region || 'ID')}</span>
+            <span class="match-count" title="Total matches completed"><i class="fa-solid fa-gamepad"></i>${totalPlayed}</span>
+          </div>
+          <div class="uid">UID: ${esc(uid)} <i class="fa-regular fa-copy" onclick="copyUid('${esc(uid)}')"></i></div>
+        </div>
+      </div>
+      <div class="badge ${statusCls}"><i class="fa-solid ${statusIc}"></i> ${esc(statusText)}</div>
+    </div>
+    <div class="metrics">
+      <div class="metric start"><span>Start EXP</span><strong>${fmt(startExp)}</strong></div>
+      <div class="metric live"><span>Live EXP</span><strong>${fmt(liveExp)}</strong></div>
+      <div class="metric match"><span>Matches</span><strong>${totalPlayed}</strong></div>
+      <div class="metric gain"><span>Exp Gained</span><strong>+${fmt(gained)}</strong></div>
+    </div>
+    <div>
+      <div class="prog-top"><span>LVL ${level} → LVL ${nextLvl}</span><span>${fmt(remaining)} EXP left</span></div>
+      <div class="track"><div class="fill" style="width:${pct.toFixed(1)}%"></div></div>
+      <div class="prog-bot"><span>${fmt(earned)} / ${fmt(needed)}</span><span class="pct">${pct.toFixed(1)}%</span></div>
+    </div>
+    <div class="node-foot">
+      <span class="time"><i class="fa-solid fa-stopwatch"></i> ${fmtDur(uptime)}</span>
+      <div class="acts">
+        <button class="act" onclick="togglePause('${esc(uid)}')" title="${paused?'Resume':'Pause'}"><i class="fa-solid ${paused?'fa-play':'fa-pause'}"></i></button>
+        <button class="act" onclick="restartAcc('${esc(uid)}')" title="Restart"><i class="fa-solid fa-rotate-right"></i></button>
+        <button class="act" onclick="refreshAcc('${esc(uid)}')" title="Sync"><i class="fa-solid fa-arrows-rotate"></i></button>
+        <button class="act danger" onclick="deleteAcc('${esc(uid)}','${esc(a.auth_uid||'')}')" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      </div>
+    </div>`;
+}
+
+function copyUid(uid){
+  navigator.clipboard?.writeText(uid).then(
+    () => toast(`UID copied: ${uid}`, 'success'),
+    () => toast(`UID: ${uid}`)
+  );
+}
+
+function setLogFilter(f, btn){
+  STATE.logFilter = f;
+  document.querySelectorAll('#logFilters button').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  _lastLogHash = '';
+  renderLogs();
+}
+
+function toggleAutoScroll(){
+  autoScroll = !autoScroll;
+  const b = $('btn-autoscroll');
+  if(autoScroll){
+    b.style.background = 'rgba(6,182,212,.14)';
+    b.style.borderColor = '#67e8f9';
+    b.style.color = '#a5f3fc';
+    const s = $('console-stream');
+    s.scrollTop = s.scrollHeight;
+  } else {
+    b.style.background = 'rgba(6,182,212,.06)';
+    b.style.borderColor = 'rgba(103,232,249,.4)';
+    b.style.color = '#67e8f9';
+  }
+}
+
+function handleLogScroll(){
+  const s = $('console-stream');
+  if(!s) return;
+  if(autoScroll && s.scrollHeight - s.scrollTop - s.clientHeight > 80){
+    autoScroll = false;
+    const b = $('btn-autoscroll');
+    if(b){
+      b.style.background = 'rgba(6,182,212,.06)';
+      b.style.borderColor = 'rgba(103,232,249,.4)';
+      b.style.color = '#67e8f9';
+    }
+  }
+}
+
+async function clearLogs(){
+  try{
+    const r = await post('/api/logs/clear');
+    if(r.status === 'ok'){
+      STATE.logs = [];
+      _lastLogHash = '';
+      renderLogs();
+      toast('Logs cleared', 'success');
+    }
+  }catch(e){ toast('Failed to clear logs', 'error'); }
+}
+
+function renderLogs(){
+  const box = $('console-stream');
+  if(!box) return;
+
+  updateTagCounts();
+
+  const filtered = getLogsByFilter(STATE.logFilter);
+  const termCount = $('termCount');
+  if(termCount) termCount.textContent = `${filtered.length} log${filtered.length !== 1 ? 's' : ''}`;
+
+  if(filtered.length === 0){
+    const emptyMsgs = {
+      all: { icon: 'fa-satellite-dish', title: 'Waiting for logs...', sub: 'Activity will appear here in real-time' },
+      account: { icon: 'fa-user-slash', title: 'No account logs', sub: 'Login / cache / session activity will appear here' },
+      match: { icon: 'fa-gamepad', title: 'No match logs', sub: 'Match start / search / complete events will appear here' },
+      exp: { icon: 'fa-star', title: 'No EXP logs', sub: 'Level up & EXP harvest events will appear here' },
+      error: { icon: 'fa-circle-check', title: 'No errors', sub: 'Great — system is running smoothly!' }
+    };
+    const em = emptyMsgs[STATE.logFilter] || emptyMsgs.all;
+    box.innerHTML = `
+      <div class="term-empty">
+        <i class="fa-solid ${em.icon}"></i>
+        <p>${em.title}</p>
+        <small>${em.sub}</small>
+      </div>`;
+    _lastLogHash = '';
+    return;
+  }
+
+  const lastMsg = filtered[filtered.length-1]?.message || '';
+  const logHash = filtered.length + '|' + STATE.logFilter + '|' + lastMsg;
+  if(_lastLogHash === logHash) return;
+  _lastLogHash = logHash;
+
+  box.innerHTML = filtered.map(l => {
+    const cat = categorizeLog(l);
+    const lvl = String(l.level || 'info').toLowerCase();
+    let catCls = '';
+    if(lvl === 'error') catCls = 'cat-error';
+    else if(lvl === 'warning') catCls = 'cat-warning';
+    else if(lvl === 'success') catCls = 'cat-success';
+
+    return `<div class="log ${catCls}" data-cat="${cat}">
+      <span class="log-ts">[${esc(l.time || '--:--:--')}]</span>
+      <span class="log-msg ${esc(lvl)}">${esc(l.message || '')}</span>
+    </div>`;
+  }).join('');
+
+  if(autoScroll) box.scrollTop = box.scrollHeight;
+}
+
+function openConfirm(config){
+  const modal = $('confirmModal');
+  const icon = $('confirmIcon');
+  const title = $('confirmTitle');
+  const msg = $('confirmMsg');
+  const body = $('confirmBody');
+  const okBtn = $('confirmOkBtn');
+
+  icon.innerHTML = `<i class="${config.icon || 'fa-solid fa-triangle-exclamation'}"></i>`;
+  icon.style.background = config.iconBg || 'rgba(251,113,133,.15)';
+  icon.style.borderColor = config.iconBorder || 'rgba(251,113,133,.5)';
+  icon.style.color = config.iconColor || 'var(--err)';
+
+  title.textContent = config.title || 'Confirm';
+  msg.textContent = config.msg || '';
+  body.innerHTML = config.bodyHtml || '';
+
+  okBtn.innerHTML = `<i class="${config.okIcon || 'fa-solid fa-trash'}"></i>${config.okText || 'Confirm'}`;
+  okBtn.style.background = config.okBg || 'linear-gradient(135deg,#fb7185,#f43f5e)';
+  okBtn.style.boxShadow = config.okShadow || '0 8px 24px rgba(244,63,94,.4)';
+
+  const newOk = okBtn.cloneNode(true);
+  okBtn.parentNode.replaceChild(newOk, okBtn);
+  newOk.addEventListener('click', async () => {
+    closeConfirm();
+    if(typeof config.onConfirm === 'function') await config.onConfirm();
+  });
+
+  modal.classList.add('active');
+}
+function closeConfirm(){ $('confirmModal').classList.remove('active'); }
+
+function deleteAcc(uid, authUid){
+  openConfirm({
+    title: 'Delete Node',
+    msg: 'Permanently delete this node? All matches will stop.',
+    bodyHtml: `<div style="display:inline-block;font-family:JetBrains Mono,monospace;font-size:15px;font-weight:700;color:var(--cyan);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.35);padding:8px 18px;border-radius:10px;margin:10px 0;word-break:break-all">${esc(uid)}</div>`,
+    okText: 'Delete',
+    okIcon: 'fa-solid fa-trash',
+    onConfirm: async () => {
+      quickDeleteAcc(uid, authUid);
+    }
+  });
+}
+
+// ==== NEW: Single Click Delete API ====
+async function quickDeleteAcc(uid, authUid){
+  try{
+    toast(`Deleting ${uid}...`, 'info');
+    const r = await post('/api/account/delete', { uid, auth_uid: authUid || '', force_kill: true });
+    if(r.status === 'ok'){
+      toast(`Node deleted`, 'success');
+      const el = document.querySelector(`.node[data-uid="${CSS.escape(uid)}"]`);
+      if(el){ el.style.opacity = '0'; setTimeout(() => el.remove(), 250); }
+      delete _lastRenderHash[uid];
+      setTimeout(fetchStats, 300);
+    } else toast(r.error || 'Delete failed', 'error');
+  }catch(e){ toast('Connection failed', 'error'); }
+}
+
+// ==== UPDATED: Clear All Accounts Logic (Individual & Bulk) ====
+async function clearAllAccounts(){
+  if(STATE.accounts.length === 0){ toast('No accounts to clear', 'warning'); return; }
+  
+  const preview = STATE.accounts.map(a => 
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.05);background:rgba(5,16,20,.5);border-radius:10px;margin-bottom:6px;">
+      <div style="text-align:left;">
+        <div style="color:#67e8f9;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace">${esc(a.uid)}</div>
+        <div style="color:var(--dim);font-size:10.5px">${esc(a.nickname || 'Unknown')}</div>
+      </div>
+      <button class="btn danger" style="padding:6px 12px;font-size:11px;border-radius:8px;" onclick="quickDeleteAcc('${esc(a.uid)}','${esc(a.auth_uid||'')}'); closeConfirm();"><i class="fa-solid fa-trash"></i> Clear</button>
+    </div>`
+  ).join('');
+
+  openConfirm({
+    title: 'Manage & Clear Accounts',
+    msg: `You have ${STATE.accounts.length} active node(s). Clear individually or all at once.`,
+    bodyHtml: `<div style="max-height:260px;overflow-y:auto;background:rgba(0,0,0,.2);border:1px solid var(--line);padding:10px;border-radius:12px;margin-top:12px;margin-bottom:12px;">${preview}</div>`,
+    okText: 'Clear All Accounts',
+    okIcon: 'fa-solid fa-dumpster-fire',
+    okBg: 'linear-gradient(135deg,#fb7185,#f43f5e)',
+    onConfirm: async () => {
+      try{
+        toast(`Clearing all ${STATE.accounts.length} accounts...`, 'info');
+        let ok = 0;
+        for(const acc of [...STATE.accounts]){
+          try{
+            const r = await post('/api/account/delete', { uid: acc.uid, auth_uid: acc.auth_uid || '', force_kill: true });
+            if(r.status === 'ok') ok++;
+          }catch(e){}
+        }
+        toast(`✅ Cleared ${ok} account(s)`, 'success');
+        _lastRenderHash = {};
+        setTimeout(fetchStats, 400);
+      }catch(e){ toast('Failed', 'error'); }
+    }
+  });
+}
+
+async function showPersisted(){
+  try{
+    const r = await fetch('/api/accounts/persisted');
+    const d = await r.json();
+    if(d.status !== 'ok'){ toast('Failed to load', 'error'); return; }
+
+    const all = d.accounts || [];
+    const failed = all.filter(a => !a.has_live);
+
+    if(failed.length === 0){
+      toast(`✅ All ${all.length} accounts are active — nothing to clean`, 'success');
+      return;
+    }
+
+    const preview = failed.slice(0, 10).map(a =>
+      `<div style="display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+        <span style="color:#67e8f9">${esc(a.uid)}</span>
+        <span style="color:var(--err);font-size:10.5px">${esc(a.live_status || 'NOT_CONNECTED')}</span>
+      </div>`
+    ).join('') + (failed.length > 10 ? `<div style="color:var(--warn);padding-top:6px">... and ${failed.length-10} more</div>` : '');
+
+    openConfirm({
+      icon: 'fa-solid fa-broom',
+      iconBg: 'rgba(251,191,36,.15)',
+      iconBorder: 'rgba(251,191,36,.5)',
+      iconColor: 'var(--warn)',
+      title: `Remove ${failed.length} Failed Account${failed.length>1?'s':''}`,
+      msg: `These bot accounts are not playing any match. Remove them all?`,
+      bodyHtml: `<div style="text-align:left;font-family:'JetBrains Mono',monospace;font-size:11.5px;line-height:1.7;background:rgba(5,16,20,.6);border:1px solid var(--line);padding:12px;border-radius:10px;max-height:220px;overflow-y:auto">${preview}</div>`,
+      okText: `Remove ${failed.length}`,
+      okIcon: 'fa-solid fa-trash',
+      okBg: 'linear-gradient(135deg,#f59e0b,#f97316)',
+      okShadow: '0 8px 24px rgba(251,191,36,.4)',
+      onConfirm: async () => {
+        try{
+          toast(`Removing ${failed.length} failed account(s)...`, 'info');
+          const cleanupRes = await post('/api/accounts/cleanup_stale');
+          if(cleanupRes.status !== 'ok'){
+            toast(cleanupRes.error || 'Cleanup failed', 'error');
+            return;
+          }
+          for(const acc of failed){
+            try{
+              await post('/api/account/delete', { uid: acc.uid || '', force_kill: true });
+            }catch(e){}
+          }
+          toast(`✅ Removed ${cleanupRes.removed || failed.length} failed account(s)`, 'success');
+          _lastRenderHash = {};
+          setTimeout(fetchStats, 400);
+        }catch(e){ toast('Connection failed', 'error'); }
+      }
+    });
+  }catch(e){ toast('Connection failed', 'error'); }
+}
+
+function openAddModal(){ $('addModal').classList.add('active'); }
+function closeAddModal(){ $('addModal').classList.remove('active'); }
+function toggleFormType(){
+  const t = $('acc-type').value;
+  $('guest-inputs').style.display = t === 'guest' ? '' : 'none';
+  $('token-inputs').style.display = t === 'token' ? '' : 'none';
+}
+$('addModal').addEventListener('click', e => { if(e.target.id === 'addModal') closeAddModal(); });
+$('confirmModal').addEventListener('click', e => { if(e.target.id === 'confirmModal') closeConfirm(); });
+$('importModal').addEventListener('click', e => { if(e.target.id === 'importModal') closeImportModal(); });
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ closeConfirm(); closeAddModal(); closeImportModal(); }
+});
+
+async function submitAdd(e){
+  e.preventDefault();
+  const type = $('acc-type').value;
+  let body;
+  if(type === 'guest'){
+    const uid = $('acc-uid').value.trim();
+    const pass = $('acc-password').value.trim();
+    if(!uid || !pass){ toast('UID & password required', 'error'); return; }
+    body = { uid, password: pass };
+  } else {
+    const tok = $('acc-token').value.trim();
+    if(!tok){ toast('Token required', 'error'); return; }
+    body = { token: tok };
+  }
+  try{
+    const r = await post('/api/account/add', body);
+    if(r.status === 'ok'){
+      closeAddModal();
+      $('acc-uid').value = ''; $('acc-password').value = ''; $('acc-token').value = '';
+      toast('Node deployed', 'success');
+      _lastRenderHash = {};
+      setTimeout(fetchStats, 300);
+    } else toast(r.error || 'Deploy failed', 'error');
+  }catch(e){ toast('Connection failed: ' + e.message, 'error'); }
+}
+
+// ==== IMPORT MODAL LOGIC ====
+function openImportModal(){
+  $('importModal').classList.add('active');
+  loadImportState();
+  if(IMPORTED_ACCOUNTS.length > 0){
+    restoreImportUI();
+  } else {
+    $('importResult').style.display = 'none';
+    $('importModalFooter').style.display = 'flex';
+    $('importList').innerHTML = '';
+    $('importCount').textContent = '0';
+    $('fileInfo').style.display = 'none';
+    $('fileInput').value = '';
+  }
+}
+function closeImportModal(){ $('importModal').classList.remove('active'); }
+
+const dropZone = $('dropZone');
+['dragenter','dragover'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('drag'); }));
+dropZone.addEventListener('drop', e => {
+  const file = e.dataTransfer.files[0];
+  if(file) readAndParseFile(file);
+});
+
+function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(file) readAndParseFile(file);
+}
+
+function readAndParseFile(file){
+  if(file.size > 5 * 1024 * 1024){
+    toast('File too large (max 5MB)', 'error');
+    return;
+  }
+  _currentFile = { name: file.name, size: file.size };
+  $('fileInfo').style.display = 'flex';
+  $('fileName').textContent = file.name;
+  $('fileSize').textContent = (file.size / 1024).toFixed(1) + ' KB';
+
+  const reader = new FileReader();
+  reader.onload = ev => processContent(ev.target.result);
+  reader.onerror = () => toast('Failed to read file', 'error');
+  reader.readAsText(file);
+}
+
+function onPasteInput(){
+  const txt = $('pasteArea').value;
+  if(txt.trim().length > 0) processContent(txt, 'Pasted');
+}
+
+function processContent(text, sourceLabel){
+  const parsed = parseCredentials(text);
+  if(parsed.accounts.length === 0){
+    toast('No UID/Password found in content', 'warning');
+    return;
+  }
+  IMPORTED_ACCOUNTS = parsed.accounts;
+  $('importFormat').textContent = parsed.format + (sourceLabel ? ' · ' + sourceLabel : '');
+  try{ localStorage.setItem('lvlup_import_format', parsed.format); }catch(e){}
+  saveImportState();
+  renderImportList();
+  
+  $('importResult').style.display = 'block';
+  $('importModalFooter').style.display = 'none';
+  toast(`✅ Found ${parsed.accounts.length} account(s) — saved`, 'success');
+}
+
+function parseCredentials(text){
+  const accounts = [];
+  const seen = new Set();
+  let format = 'Unknown';
+
+  const addAccount = (uid, password) => {
+    uid = String(uid || '').trim();
+    password = String(password || '').trim();
+    if(!uid || !password) return;
+    if(uid.length < 4 || password.length < 3) return;
+    if(seen.has(uid)) return;
+    seen.add(uid);
+    accounts.push({ uid, password });
+  };
+
+  try {
+    const trimmed = text.trim();
+    let jsonData = null;
+    if(trimmed.startsWith('[') || trimmed.startsWith('{')) {
+      try { jsonData = JSON.parse(trimmed); } catch(e) {}
+    }
+    if(!jsonData){
+      const match = trimmed.match(/\[\s*\{[\s\S]*?\}\s*\]/);
+      if(match){ try { jsonData = JSON.parse(match[0]); } catch(e){} }
+    }
+    if(!jsonData){
+      const objMatches = trimmed.match(/\{[^{}]*\}/g);
+      if(objMatches && objMatches.length > 0){
+        jsonData = [];
+        for(const m of objMatches){
+          try { jsonData.push(JSON.parse(m)); } catch(e){}
+        }
+        if(jsonData.length === 0) jsonData = null;
+      }
+    }
+
+    if(jsonData){
+      const arr = Array.isArray(jsonData) ? jsonData : [jsonData];
+      for(const item of arr){
+        if(!item || typeof item !== 'object') continue;
+        const uid = item.uid || item.UID || item.Uid || item.account_id || item.accountId || item.accountID ||
+                    item.guest_uid || item.guestUid || item.user_id || item.userId ||
+                    item['com.garena.msdk.guest_uid'] || item.player_id;
+        const pwd = item.password || item.Password || item.pass || item.pwd ||
+                    item.guest_password || item.guestPassword ||
+                    item['com.garena.msdk.guest_password'];
+        if(uid && pwd) addAccount(uid, pwd);
+      }
+      if(accounts.length > 0){
+        format = 'JSON';
+        return { accounts, format };
+      }
+    }
+  } catch(e){}
+
+  const msdkUids = [];
+  const msdkPwds = [];
+  let m;
+  const reUid = /(?:com\.garena\.msdk\.)?guest_uid\s*[:=]\s*["']?([0-9]{4,})["']?/gi;
+  const rePwd = /(?:com\.garena\.msdk\.)?guest_password\s*[:=]\s*["']?([^\s"',;}\]]+)["']?/gi;
+  while((m = reUid.exec(text)) !== null) msdkUids.push({ v: m[1], i: m.index });
+  while((m = rePwd.exec(text)) !== null) msdkPwds.push({ v: m[1], i: m.index });
+
+  if(msdkUids.length > 0 && msdkPwds.length > 0){
+    for(const u of msdkUids){
+      let closest = null, minDist = Infinity;
+      for(const p of msdkPwds){
+        const d = Math.abs(p.i - u.i);
+        if(d < minDist){ minDist = d; closest = p; }
+      }
+      if(closest && minDist < 500) addAccount(u.v, closest.v);
+    }
+    if(accounts.length > 0){
+      format = 'Garena SDK';
+      return { accounts, format };
+    }
+  }
+
+  const uidKeys = ['uid', 'user_id', 'userid', 'guest_uid', 'account_id', 'accountid', 'game_uid', 'player_id', 'id'];
+  const pwdKeys = ['password', 'pass', 'pwd', 'guest_password', 'passwd', 'secret'];
+  const lines = text.split(/\r?\n/);
+  let currentUid = null;
+  let currentPwd = null;
+
+  const flush = () => {
+    if(currentUid && currentPwd) addAccount(currentUid, currentPwd);
+    currentUid = null;
+    currentPwd = null;
+  };
+
+  let kvFound = false;
+  for(const line of lines){
+    const trimmed = line.trim();
+    if(!trimmed){ continue; }
+    let foundUid = false, foundPwd = false;
+    const kvRegex = /([a-zA-Z_][a-zA-Z0-9_]*)\s*[:=]\s*["']?([^\s"',;}\]]+)["']?/g;
+    let kv;
+    while((kv = kvRegex.exec(trimmed)) !== null){
+      const k = kv[1].toLowerCase();
+      const v = kv[2];
+      if(uidKeys.includes(k) && /^[0-9]{4,}$/.test(v)){
+        if(currentUid && currentPwd) flush();
+        currentUid = v;
+        foundUid = true;
+      } else if(pwdKeys.includes(k) && v.length >= 3){
+        currentPwd = v;
+        foundPwd = true;
+      }
+    }
+    if(foundUid || foundPwd) kvFound = true;
+    if(foundUid && foundPwd) flush();
+  }
+  flush();
+
+  if(kvFound && accounts.length > 0){
+    format = 'Key=Value';
+    return { accounts, format };
+  }
+
+  if(accounts.length === 0){
+    for(let i = 0; i < lines.length - 1; i++){
+      const a = lines[i].trim();
+      const b = lines[i+1].trim();
+      if(/^[0-9]{6,}$/.test(a) && b.length >= 3 && !/^[0-9]{6,}$/.test(b)){
+        addAccount(a, b);
+        i++;
+      }
+    }
+    if(accounts.length > 0){
+      format = 'Line Pairs';
+      return { accounts, format };
+    }
+  }
+
+  if(accounts.length === 0){
+    const re = /([0-9]{6,})\s*[\s,;|\t]+\s*([A-Za-z0-9_@!#$%^&*.\-]{3,})/g;
+    let pm;
+    while((pm = re.exec(text)) !== null) addAccount(pm[1], pm[2]);
+    if(accounts.length > 0){
+      format = 'Delimited';
+      return { accounts, format };
+    }
+  }
+
+  return { accounts, format: 'None' };
+}
+
+function renderImportList(){
+  const list = $('importList');
+  $('importResult').style.display = 'block';
+  $('importModalFooter').style.display = 'none';
+  $('importCount').textContent = IMPORTED_ACCOUNTS.length + ' account(s)';
+  list.innerHTML = IMPORTED_ACCOUNTS.map((acc, i) => `
+    <div class="import-row" data-idx="${i}">
+      <span class="idx">${i + 1}.</span>
+      <div class="info">
+        <span class="uid-line">UID: ${esc(acc.uid)}</span>
+        <span class="pwd-line"><span class="ok">✓ Pass</span> · ${esc(acc.password.slice(0, 4))}••••</span>
+      </div>
+      <button class="deploy-btn" onclick="deployOne(${i}, this)">DEPLOY</button>
+      <button class="row-del" onclick="removeImported(${i})" title="Remove from list"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  `).join('');
+}
+
+function removeImported(idx){
+  IMPORTED_ACCOUNTS.splice(idx, 1);
+  saveImportState();
+  if(IMPORTED_ACCOUNTS.length === 0){
+    $('importResult').style.display = 'none';
+    $('importModalFooter').style.display = 'flex';
+    $('importList').innerHTML = '';
+    $('importCount').textContent = '0';
+    toast('Import list cleared', 'warning');
+    return;
+  }
+  renderImportList();
+  toast('Removed from list', 'info');
+}
+
+async function deployOne(idx, btn){
+  const acc = IMPORTED_ACCOUNTS[idx];
+  if(!acc) return;
+  if(btn.classList.contains('done')) return;
+  btn.textContent = '...';
+  btn.disabled = true;
+  try{
+    const r = await post('/api/account/add', { uid: acc.uid, password: acc.password });
+    if(r && r.status === 'ok'){
+      btn.textContent = '✓ Done';
+      btn.classList.add('done');
+      toast(`✅ Deployed: ${acc.uid}`, 'success');
+      _lastRenderHash = {};
+      setTimeout(fetchStats, 400);
+    } else {
+      btn.textContent = 'Retry';
+      btn.classList.add('error');
+      btn.disabled = false;
+      toast(r && r.error ? r.error : 'Deploy failed', 'error');
+    }
+  }catch(e){
+    btn.textContent = 'Retry';
+    btn.classList.add('error');
+    btn.disabled = false;
+    toast('Connection failed', 'error');
+  }
+}
+
+async function deployAllImported(){
+  if(IMPORTED_ACCOUNTS.length === 0){ toast('Nothing to deploy', 'warning'); return; }
+  toast(`Deploying ${IMPORTED_ACCOUNTS.length} account(s)...`, 'info');
+  let ok = 0;
+  for(let i = 0; i < IMPORTED_ACCOUNTS.length; i++){
+    const acc = IMPORTED_ACCOUNTS[i];
+    const row = document.querySelector(`.import-row[data-idx="${i}"] .deploy-btn`);
+    if(row && row.classList.contains('done')){ ok++; continue; }
+    try{
+      const r = await post('/api/account/add', { uid: acc.uid, password: acc.password });
+      if(r && r.status === 'ok'){
+        ok++;
+        if(row){ row.textContent = '✓ Done'; row.classList.add('done'); }
+      } else if(row){ row.textContent = 'Retry'; row.classList.add('error'); }
+    }catch(e){ if(row){ row.textContent = 'Retry'; row.classList.add('error'); } }
+  }
+  toast(`✅ Deployed ${ok}/${IMPORTED_ACCOUNTS.length}`, ok > 0 ? 'success' : 'error');
+  _lastRenderHash = {};
+  setTimeout(fetchStats, 600);
+}
+
+function clearImportList(){
+  if(IMPORTED_ACCOUNTS.length === 0){ toast('List already empty', 'warning'); return; }
+  openConfirm({
+    title: 'Clear Import List',
+    msg: `Remove all ${IMPORTED_ACCOUNTS.length} saved accounts from import list? (Bot accounts stay running)`,
+    okText: 'Clear List',
+    okIcon: 'fa-solid fa-xmark',
+    onConfirm: async () => {
+      IMPORTED_ACCOUNTS = [];
+      _currentFile = null;
+      try{
+        localStorage.removeItem(LS_KEY_IMPORT_LIST);
+        localStorage.removeItem(LS_KEY_IMPORT_FILE);
+        localStorage.removeItem('lvlup_import_format');
+      }catch(e){}
+      $('importResult').style.display = 'none';
+      $('importModalFooter').style.display = 'flex';
+      $('importList').innerHTML = '';
+      $('importCount').textContent = '0';
+      $('fileInput').value = '';
+      $('fileInfo').style.display = 'none';
+      toast('Import list cleared permanently', 'success');
+    }
+  });
+}
+
+async function togglePause(uid){
+  try{
+    const r = await post('/api/account/pause', { uid });
+    if(r.status === 'ok'){
+      toast(r.is_paused ? `${uid} paused` : `${uid} resumed`, r.is_paused ? 'warning' : 'success');
+      _lastRenderHash = {};
+      fetchStats();
+    } else toast(r.error || 'Failed', 'error');
+  }catch(e){ toast('Connection failed', 'error'); }
+}
+async function togglePauseAll(){
+  try{
+    const r = await post('/api/account/pause_all');
+    if(r.status === 'ok'){
+      toast(r.all_paused ? 'All paused' : 'All resumed', r.all_paused ? 'warning' : 'success');
+      _lastRenderHash = {};
+      fetchStats();
+    } else toast(r.error || 'Failed', 'error');
+  }catch(e){ toast('Connection failed', 'error'); }
+}
+async function restartAcc(uid){
+  try{ toast(`Restarting...`, 'info'); await post('/api/account/restart', { uid }); _lastRenderHash = {}; setTimeout(fetchStats, 600); }
+  catch(e){ toast('Restart failed', 'error'); }
+}
+async function refreshAcc(uid){
+  try{ toast(`Syncing...`, 'info'); await post('/api/account/refresh', { uid }); _lastRenderHash = {}; setTimeout(fetchStats, 600); }
+  catch(e){ toast('Sync failed', 'error'); }
+}
+
+// ---------- REFRESH HANDLERS WITH DISCORD SPIN ----------
+async function refreshDashboard(btn) {
+  setRefreshing(btn, true);
+  try {
+    await fetchStats();
+    toast('Dashboard refreshed', 'success');
+  } catch (e) {
+    toast('Refresh failed', 'error');
+  } finally {
+    setTimeout(() => setRefreshing(btn, false), 400);
+  }
+}
+
+async function refreshBotAccounts(btn) {
+  setRefreshing(btn, true);
+  try {
+    await fetchStats();
+    toast('Bot accounts updated', 'success');
+  } catch (e) {
+    toast('Refresh failed', 'error');
+  } finally {
+    setTimeout(() => setRefreshing(btn, false), 400);
+  }
+}
+// --------------------------------------------------------
+
+$('menuBtn').addEventListener('click', e => { e.stopPropagation(); document.body.classList.toggle('menu-open'); });
+$('overlay').addEventListener('click', () => document.body.classList.remove('menu-open'));
+document.querySelectorAll('.nav-item').forEach(btn => btn.addEventListener('click', () => {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  $('page-' + btn.dataset.page).classList.add('active');
+  $('topTitle').textContent = btn.dataset.title;
+  document.body.classList.remove('menu-open');
+}));
+
+loadImportState();
+
+fetchStats();
+setInterval(fetchStats, 2000);
+</script>
+</body>
+</html>
